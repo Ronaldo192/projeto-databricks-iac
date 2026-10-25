@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run "/Users/thiagoazro@gmail.com/ETL_arquitetura_medalhao/00.config/config"
+# MAGIC %run "../00.config/config"
 
 # COMMAND ----------
 
