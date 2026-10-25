@@ -1,3 +1,2 @@
-var = "ola Mundo"
-
+var = 1
 print(var)
