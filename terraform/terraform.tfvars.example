@@ -1,0 +1,3 @@
+databricks_host     = "https://community.cloud.databricks.com"
+databricks_token    = "dapi..."
+workspace_base_path = "/Shared/projeto_faculdade"
