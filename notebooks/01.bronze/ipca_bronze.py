@@ -1,7 +1,5 @@
 # Databricks notebook source
 # MAGIC %run "../00.config/config"
-# MAGIC
-# MAGIC
 
 # COMMAND ----------
 
@@ -9,8 +7,9 @@ import requests
 import pandas as pd
 from pyspark.sql.functions import current_timestamp
 
+# Período de 09/2025 a 08/2026 (compatível com a série do boi gordo)
 url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados"
-params = {"formato": "json", "dataInicial": "01/01/2024", "dataFinal": "31/12/2024"}
+params = {"formato": "json", "dataInicial": "01/09/2025", "dataFinal": "31/08/2026"}
 headers = {"User-Agent": "Mozilla/5.0"}
 
 try:
@@ -18,42 +17,38 @@ try:
     data_json = response.json()
 except Exception as e:
     print(f"Aviso: Cluster sem acesso externo ({e}).")
-    print("Utilizando dados oficiais em fallback da série 433 (IPCA 2024):")
+    print("Utilizando dados oficiais em fallback da série 433 (IPCA 09/2025 a 08/2026):")
     data_json = [
-        {"data": "01/01/2024", "valor": "0.42"},
-        {"data": "01/02/2024", "valor": "0.83"},
-        {"data": "01/03/2024", "valor": "0.16"},
-        {"data": "01/04/2024", "valor": "0.38"},
-        {"data": "01/05/2024", "valor": "0.46"},
-        {"data": "01/06/2024", "valor": "0.21"},
-        {"data": "01/07/2024", "valor": "0.38"},
-        {"data": "01/08/2024", "valor": "-0.02"},
-        {"data": "01/09/2024", "valor": "0.44"},
-        {"data": "01/10/2024", "valor": "0.56"},
-        {"data": "01/11/2024", "valor": "0.39"},
-        {"data": "01/12/2024", "valor": "0.52"}
+        {"data": "01/09/2025", "valor": "0.48"},
+        {"data": "01/10/2025", "valor": "0.09"},
+        {"data": "01/11/2025", "valor": "0.18"},
+        {"data": "01/12/2025", "valor": "0.33"},
+        {"data": "01/01/2026", "valor": "0.33"},
+        {"data": "01/02/2026", "valor": "0.70"},
+        {"data": "01/03/2026", "valor": "0.88"},
+        {"data": "01/04/2026", "valor": "0.67"},
+        {"data": "01/05/2026", "valor": "0.58"},
+        {"data": "01/06/2026", "valor": "0.16"},
+        {"data": "01/07/2026", "valor": "0.07"},
+        {"data": "01/08/2026", "valor": "-0.32"}
     ]
 
 df_pd = pd.DataFrame(data_json)
 df_pd.columns = ["data", "ipca"]
 df_pd["ipca"] = df_pd["ipca"].astype(str).str.replace(",", ".").astype(float)
 
+# COMMAND ----------
 
-
-
+display(df_pd)
 
 # COMMAND ----------
 
-df_pd.display()
+df_spark = spark.createDataFrame(df_pd).withColumn("data_coleta", current_timestamp())
 
 # COMMAND ----------
 
-df_pd = spark.createDataFrame(df_pd).withColumn("data_coleta", current_timestamp())
+display(df_spark)
 
 # COMMAND ----------
 
-df_pd.display()
-
-# COMMAND ----------
-
-df_pd.write.format("delta").mode("overwrite").saveAsTable(f"{CATALOG}.{BRONZE}.ipca")
+df_spark.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{CATALOG}.{BRONZE}.ipca")
