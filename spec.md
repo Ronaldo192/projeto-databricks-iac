@@ -59,12 +59,20 @@ projeto-databricks-iac/
 │   ├── outputs.tf              # Outputs pós-deploy
 │   └── terraform.tfvars.example# Template para variáveis locais (ignorado no git)
 ├── notebooks/
-│   ├── 01_ingestao.py          # Código Spark: Ingestão de dados brutos
-│   ├── 02_silver.py            # Código Spark: Limpeza e tipagem
-│   └── 03_gold.py              # Código Spark: Agregações de negócio
+│   ├── 00.config/
+│   │   └── config.py           # Configurações do catálogo e schemas Unity Catalog
+│   ├── 01.bronze/
+│   │   ├── boi_gordo_bronze.py # Ingestão e versionamento da cotação do Boi Gordo (CEPEA)
+│   │   └── ipca_bronze.py      # Ingestão via API REST do IPCA (BACEN)
+│   ├── 02.silver/
+│   │   └── economia_silver.py  # Higienização, tipagem e cruzamento temporal (Inner Join)
+│   └── 03.gold/
+│       └── gold_insights.py    # Métricas analíticas, window functions e views BI
+├── docs/
+│   └── images/
+│       └── projeto_iac_git_databricks.jfif
 ├── .gitignore
 └── README.md
-
 ```
 
 ---
