@@ -54,7 +54,11 @@ gold.write.format("delta").mode("overwrite").saveAsTable(f"{CATALOG}.{GOLD}.insi
 # MAGIC             WHEN ABS(variacao_boi - variacao_ipca) > 5 THEN 'Alta divergência'
 # MAGIC             WHEN ABS(variacao_boi - variacao_ipca) BETWEEN 2 AND 5 THEN 'Média divergência'
 # MAGIC             ELSE 'Baixa divergência'
-# MAGIC         END AS classe_impacto
+# MAGIC         END AS classe_impacto,
+# MAGIC         ROUND(CORR(variacao_ipca, variacao_boi) OVER (), 4) AS correlacao_global,
+# MAGIC         ROUND(AVG(variacao_ipca) OVER (), 2) AS media_ipca_global,
+# MAGIC         ROUND(AVG(variacao_boi) OVER (), 2) AS media_boi_global,
+# MAGIC         ROUND(AVG((variacao_ipca + variacao_boi) / 2) OVER (), 2) AS media_combinada_global
 # MAGIC     FROM workspace.gold_economia.insights
 # MAGIC )
 # MAGIC SELECT * FROM base;
